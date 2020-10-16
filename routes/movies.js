@@ -40,7 +40,7 @@ function moviesApi(app) {
         console.log(value);
         return value;
       });
-
+      console.log("resul "+result);
   
       if(result){
         const resultJSON = JSON.parse(result);

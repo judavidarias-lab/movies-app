@@ -39,9 +39,11 @@ function moviesApi(app) {
         // retornara null si la key no existe
         console.log(value);
         if(value){
+          console.log(true);
           const resultJSON = JSON.parse(value);
           return res.status(200).json(resultJSON);
         }else{
+          console.log(false);
           const movies = await moviesService.getMovies({ tags });
           const jsonResponse = {
             data: movies,

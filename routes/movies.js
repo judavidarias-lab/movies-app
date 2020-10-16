@@ -1,16 +1,6 @@
 const express = require('express');
 const MoviesService = require('../services/movies');
 
-const { config } = require('../config');
-
-var redis = require("redis");
-
-var client = redis.createClient(config.portRedis, config.hostRedis);
-client.on("connect", function() {
-  console.log("You are now connected");
-});
-
-
 const {
   movieIdSchema,
   createMovieSchema,
@@ -30,37 +20,13 @@ function moviesApi(app) {
 
     try {
 
-      console.log(tags);
-      return client.get(tags+"", async function(err, value) {
-        if(err){
-          console.log(err);
-          throw new Error(err);
-        }
-        // retornara null si la key no existe
-        console.log(value);
-        if(value){
-          console.log(true);
-          const resultJSON = JSON.parse(value);
-          return res.status(200).json(resultJSON);
-        }else{
-          console.log(false);
-          const movies = await moviesService.getMovies({ tags });
-          const jsonResponse = {
-            data: movies,
-            message: 'movies listed redis'
-          }
-  
-  
-        
-          client.set(tags+"", JSON.stringify({ jsonResponse }), function(err, reply) {
-            console.log("save redis"+reply);
-          });
-  
-          return res.status(200).json(jsonResponse);
-        }
-      });
-  
-      
+      const movies = await moviesService.getMovies({ tags });
+      const jsonResponse = {
+        data: movies,
+        message: 'movies listed '
+      }
+
+      return res.status(200).json(jsonResponse);
 
     } catch (err) {
       next(err);

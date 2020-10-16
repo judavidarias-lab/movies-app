@@ -31,7 +31,7 @@ function moviesApi(app) {
     try {
 
 
-      var result = client.get(tags);
+      var result = await client.get(tags);
       if(result){
         const resultJSON = JSON.parse(result);
         return res.status(200).json(resultJSON);

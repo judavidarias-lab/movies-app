@@ -51,7 +51,9 @@ function moviesApi(app) {
           data: movies,
           message: 'movies listed redis'
         }
-        client.setex(tags, 3600, JSON.stringify({ jsonResponse }));
+
+
+        client.set(tags, 3600, JSON.stringify({ jsonResponse }));
         return res.status(200).json(jsonResponse);
       }
 

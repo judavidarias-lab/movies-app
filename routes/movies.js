@@ -1,7 +1,14 @@
 const express = require('express');
 const MoviesService = require('../services/movies');
 
-const RedisLib = require('../lib/redis');
+const { config } = require('../config');
+
+var redis = require("redis");
+
+var client = redis.createClient(config.portRedis, config.hostRedis);
+client.on("connect", function() {
+  console.log("You are now connected");
+});
 
 
 const {
@@ -17,7 +24,6 @@ function moviesApi(app) {
   app.use('/api/movies', router);
 
   const moviesService = new MoviesService();
-  const redisService = new RedisLib();
 
   router.get('/', async function(req, res, next) {
     const { tags } = req.query;
@@ -25,7 +31,7 @@ function moviesApi(app) {
     try {
 
      
-      redisService.connect().get(tags,  async (err, result) => {
+      client.get(tags,  async (err, result) => {
         if (result) {
           const resultJSON = JSON.parse(result);
           return res.status(200).json(resultJSON);
@@ -36,7 +42,7 @@ function moviesApi(app) {
             data: movies,
             message: 'movies listed redis'
           }
-          redisService.setex(tags, 3600, JSON.stringify({ jsonResponse }));
+          client.setex(tags, 3600, JSON.stringify({ jsonResponse }));
           return res.status(200).json(jsonResponse);
 
         }

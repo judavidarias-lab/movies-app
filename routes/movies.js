@@ -31,7 +31,17 @@ function moviesApi(app) {
     try {
 
 
-      var result = await client.get(tags);
+      var result =  client.get(tags, function(err, value) {
+        if(err){
+          console.log(err);
+          return;
+        }
+        // retornara null si la key no existe
+        console.log(value);
+        return value;
+      });
+
+  
       if(result){
         const resultJSON = JSON.parse(result);
         return res.status(200).json(resultJSON);

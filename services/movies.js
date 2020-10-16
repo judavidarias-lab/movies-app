@@ -18,7 +18,7 @@ class MoviesService {
 
   async getMovies({ tags }) {
     const k = tags+"";
-    const value = await client.get();
+    const value = await client.get(k);
     if(value){
       return value;
     }else{

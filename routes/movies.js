@@ -30,27 +30,21 @@ function moviesApi(app) {
 
     try {
 
-     
-      client.get(tags,  async (err, result) => {
-        if (result) {
-          const resultJSON = JSON.parse(result);
-          return res.status(200).json(resultJSON);
-        } else {
 
-          const movies = await moviesService.getMovies({ tags });
-          const jsonResponse = {
-            data: movies,
-            message: 'movies listed redis'
-          }
-          client.setex(tags, 3600, JSON.stringify({ jsonResponse }));
-          return res.status(200).json(jsonResponse);
-
+      var result = client.get(tags);
+      if(result){
+        const resultJSON = JSON.parse(result);
+        return res.status(200).json(resultJSON);
+      }else{
+        const movies = await moviesService.getMovies({ tags });
+        const jsonResponse = {
+          data: movies,
+          message: 'movies listed redis'
         }
-      })
+        client.setex(tags, 3600, JSON.stringify({ jsonResponse }));
+        return res.status(200).json(jsonResponse);
+      }
 
-     
-
-      
     } catch (err) {
       next(err);
     }

@@ -25,7 +25,7 @@ class MoviesService {
       const query = tags && { tags: { $in: tags } };
       const movies = await this.mongoDB.getAll(this.collection, query);
       await client.set(k,  movies );
-      await client.flushall(k);
+     // await client.flushall(k);
       return movies || [];
     }
     

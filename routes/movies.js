@@ -52,7 +52,7 @@ function moviesApi(app) {
   
   
         
-          client.set(tags, JSON.stringify({ jsonResponse }), function(err, reply) {
+          client.set(tags+"", JSON.stringify({ jsonResponse }), function(err, reply) {
             console.log("save redis"+reply);
           });
   

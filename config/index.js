@@ -7,7 +7,9 @@ const config = {
   dbUser: process.env.DB_USER,
   dbPassword: process.env.DB_PASSWORD,
   dbHost: process.env.DB_HOST,
-  dbName: process.env.DB_NAME
+  dbName: process.env.DB_NAME,
+  portRedis : process.env.PORT_REDIS,
+  hostRedis : process.env.HOST_REDIS
 };
 
 module.exports = { config };

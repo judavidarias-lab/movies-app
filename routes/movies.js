@@ -1,6 +1,9 @@
 const express = require('express');
 const MoviesService = require('../services/movies');
 
+const RedisLib = require('../lib/redis');
+
+
 const {
   movieIdSchema,
   createMovieSchema,
@@ -14,17 +17,34 @@ function moviesApi(app) {
   app.use('/api/movies', router);
 
   const moviesService = new MoviesService();
+  const redisService = new RedisLib();
 
   router.get('/', async function(req, res, next) {
     const { tags } = req.query;
 
     try {
-      const movies = await moviesService.getMovies({ tags });
 
-      res.status(200).json({
-        data: movies,
-        message: 'movies listed'
-      });
+     
+      redisService.connect().get(tags,  async (err, result) => {
+        if (result) {
+          const resultJSON = JSON.parse(result);
+          return res.status(200).json(resultJSON);
+        } else {
+
+          const movies = await moviesService.getMovies({ tags });
+          const jsonResponse = {
+            data: movies,
+            message: 'movies listed redis'
+          }
+          redisService.setex(tags, 3600, JSON.stringify({ jsonResponse }));
+          return res.status(200).json(jsonResponse);
+
+        }
+      })
+
+     
+
+      
     } catch (err) {
       next(err);
     }

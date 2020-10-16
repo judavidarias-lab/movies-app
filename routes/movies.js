@@ -31,7 +31,7 @@ function moviesApi(app) {
     try {
 
       console.log(tags);
-      var result =  client.get(tags.toString(), function(err, value) {
+      var result =  client.get(tags+"", function(err, value) {
         if(err){
           console.log(err);
           return;

@@ -31,35 +31,34 @@ function moviesApi(app) {
     try {
 
       console.log(tags);
-      var result =  client.get(tags+"", function(err, value) {
+      return client.get(tags+"", async function(err, value) {
         if(err){
           console.log(err);
-          return;
+          throw new Error(err);
         }
         // retornara null si la key no existe
         console.log(value);
-        return value;
-      });
-      console.log("resul "+result);
+        if(value){
+          const resultJSON = JSON.parse(value);
+          return res.status(200).json(resultJSON);
+        }else{
+          const movies = await moviesService.getMovies({ tags });
+          const jsonResponse = {
+            data: movies,
+            message: 'movies listed redis'
+          }
   
-      if(result){
-        const resultJSON = JSON.parse(result);
-        return res.status(200).json(resultJSON);
-      }else{
-        const movies = await moviesService.getMovies({ tags });
-        const jsonResponse = {
-          data: movies,
-          message: 'movies listed redis'
+  
+        
+          client.set(tags, JSON.stringify({ jsonResponse }), function(err, reply) {
+            console.log("save redis"+reply);
+          });
+  
+          return res.status(200).json(jsonResponse);
         }
-
-
+      });
+  
       
-        client.set(tags, JSON.stringify({ jsonResponse }), function(err, reply) {
-          console.log("save redis"+reply);
-        });
-
-        return res.status(200).json(jsonResponse);
-      }
 
     } catch (err) {
       next(err);

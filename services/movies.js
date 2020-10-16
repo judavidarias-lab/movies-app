@@ -2,7 +2,7 @@ const MongoLib = require('../lib/mongo');
 
 const { config } = require('../config');
 
-var redis = require("redis");
+var redis = require("async-redis");
 
 var client = redis.createClient(config.portRedis, config.hostRedis);
 client.on("connect", function() {
@@ -17,25 +17,18 @@ class MoviesService {
   }
 
   async getMovies({ tags }) {
+    const k = tags+"";
+    const value = await client.get();
+    if(value){
+      return value;
+    }else{
+      const query = tags && { tags: { $in: tags } };
+      const movies = await this.mongoDB.getAll(this.collection, query);
+      await client.set(k, JSON.stringify({ movies }));
+      await client.flushall(k);
+      return movies || [];
+    }
     
-    return client.get(tags+"", async function(err, value) {
-      if(err){
-        console.log(err);
-        throw new Error(err);
-      }
-      // retornara null si la key no existe
-      console.log(value);
-      if(value){
-        return value;
-      }else{
-        const query = tags && { tags: { $in: tags } };
-        const movies = await this.mongoDB.getAll(this.collection, query);
-        client.set(tags+"", JSON.stringify({ movies }), function(err, reply) {
-          console.log("save redis"+reply);
-        });
-        return movies || [];
-      }
-    });
   }
 
   async getMovie({ movieId }) {

@@ -20,12 +20,12 @@ class MoviesService {
     const k = tags+"";
     const value = await client.get(k);
     if(value){
-      return value;
+      return JSON.parse(value);
     }else{
       const query = tags && { tags: { $in: tags } };
       const movies = await this.mongoDB.getAll(this.collection, query);
-      await client.set(k,  movies );
-     // await client.flushall(k);
+      await client.set(k, JSON.stringify({ movies }));
+      //await client.flushall(k);
       return movies || [];
     }
     

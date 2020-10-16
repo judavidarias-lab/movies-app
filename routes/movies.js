@@ -53,7 +53,11 @@ function moviesApi(app) {
         }
 
 
-        client.set(tags, 3600, JSON.stringify({ jsonResponse }));
+      
+        client.set(tags, JSON.stringify({ jsonResponse }), function(err, reply) {
+          console.log("save redis"+reply);
+        });
+
         return res.status(200).json(jsonResponse);
       }
 
